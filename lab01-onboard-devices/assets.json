@@ -1,0 +1,8 @@
+[
+    { "asset": "asset-0001", "description": "Sample asset", "location": "site A" },
+    { "asset": "asset-0002", "description": "Sample asset", "location": "site A" },
+    { "asset": "asset-0003", "description": "Sample asset", "location": "site B" },
+    { "asset": "asset-0004", "description": "Sample asset", "location": "site B" },
+    { "asset": "asset-0005", "description": "Sample asset", "location": "site C" },
+    { "asset": "asset-0006", "description": "Sample asset", "location": "site C" }
+]

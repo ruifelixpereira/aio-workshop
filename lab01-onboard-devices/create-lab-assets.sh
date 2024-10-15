@@ -7,14 +7,8 @@ set -a && source .env && set +a
 required_vars=(
     "resource_group"
     "location"
-    "customLocationName"
-    "schemaRegistryResourceGroup"
-    "schemaRegistryName"
-    "aioInstanceName"
-    "adxClusterUri"
-    "adxDatabaseName"
-    "adxTableName"
-    "mqttTopic"
+    "aio_instance"
+    "asset_endpoint_profile"
 )
 
 # Set the current directory to where the script lives.
@@ -62,19 +56,43 @@ else
 fi
 
 #
-# Create lab
+# Create Asset endpoint profile
 #
-az deployment group create \
-      --name adx-dataflow \
-      --resource-group $resource_group \
-      --template-file ./adx-dataflow.bicep \
-      --parameters customLocationName=$customLocationName \
-      --parameters schemaRegistryResourceGroup=$schemaRegistryResourceGroup \
-      --parameters schemaRegistryName=$schemaRegistryName \
-      --parameters aioInstanceName=$aioInstanceName \
-      --parameters mqttTopic=$mqttTopic \
-      --parameters adxDatabaseName=$adxDatabaseName \
-      --parameters adxTableName=$adxDatabaseName \
-      --parameters adxClusterUri="${adxClusterUri}"
 
-exit 0
+ae_query=$(az iot ops asset endpoint query --instance ${aio_instance} --query "[?name=='$asset_endpoint_profile']")
+if [ "$ae_query" == "[]" ]; then
+   echo -e "\nCreating Asset endpoint '$asset_endpoint_profile'"
+   az iot ops asset endpoint create opcua --name ${asset_endpoint_profile} --resource-group ${resource_group} --instance ${aio_instance} --target-address "opc.tcp://opcdummy:55555"
+else
+   echo "Asset endpoint $asset_endpoint_profile already exists."
+fi
+
+#
+# Create Assets
+#
+ASSET_NAME="asset-000"
+
+asset_query=$(az iot ops asset query --instance ${aio_instance} --query "[?name=='$ASSET_NAME']")
+if [ "$asset_query" == "[]" ]; then
+   echo -e "\nCreating Asset '$ASSET_NAME'"
+
+   # Create asset
+   az iot ops asset create \
+     --name ${ASSET_NAME} \
+     -g ${resource_group} \
+     --instance ${aio_instance} \
+     --endpoint-profile ${asset_endpoint_profile} \
+     --description "Sample mqtt enabled asset" \
+     --custom-attribute "batch=102" "customer=Contoso" "equipment=Boiler" "isSpare=true" "location=Seattle"
+     #--topic-path "devices/thermostatmqtt/messages/events"
+
+   # Create tags
+   az iot ops asset dataset point import \
+     --asset ${ASSET_NAME} \
+     -g ${resource_group} \
+     --dataset default \
+     --if ./thermostat_tags.csv
+   
+else
+   echo "Asset $ASSET_NAME already exists."
+fi

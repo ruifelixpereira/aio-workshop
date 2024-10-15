@@ -1,0 +1,32 @@
+apiVersion: deviceregistry.microsoft.com/v1beta2
+kind: Asset
+metadata:
+  name: asset-999
+  namespace: azure-iot-operations
+spec:
+  assetEndpointProfileRef: mqtt-asset-profile
+  attributes:
+    batch: "102"
+    customer: Contoso
+    equipment: Boiler
+    isSpare: "true"
+    location: Seattle
+  datasets:
+  - dataPoints:
+    - dataPointConfiguration: '{"samplingInterval": 1000, "queueSize": 1}'
+      dataSource: ns=3;s=FastUInt10
+      name: temperature
+      observabilityMode: None
+    - dataPointConfiguration: '{"samplingInterval": 1000, "queueSize": 1}'
+      dataSource: ns=3;s=FastUInt100
+      name: Tag 10
+      observabilityMode: None
+    name: default
+  defaultDatasetsConfiguration: '{"publishingInterval": 1000, "samplingInterval":
+    500, "queueSize": 1}'
+  defaultEventsConfiguration: '{"publishingInterval": 1000, "samplingInterval": 500,
+    "queueSize": 1}'
+  description: Sample mqtt enabled asset
+  displayName: asset-999
+  enabled: true
+  events: []

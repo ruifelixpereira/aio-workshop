@@ -1,0 +1,52 @@
+{
+  "name": "simple-mq-copy",
+  "properties": {
+    "mode": "Enabled",
+    "operations": [
+      {
+        "operationType": "Source",
+        "sourceSettings": {
+          "endpointRef": "default",
+          "serializationFormat": "Json",
+          "dataSources": [
+            "devices/xpto/temperature"
+          ]
+        },
+        "destinationSettings": null
+      },
+      {
+        "operationType": "BuiltInTransformation",
+        "sourceSettings": null,
+        "destinationSettings": null,
+        "builtInTransformationSettings": {
+          "serializationFormat": "Json",
+          "datasets": [],
+          "filter": [],
+          "map": [
+            {
+              "type": "PassThrough",
+              "inputs": [
+                "*"
+              ],
+              "output": "*"
+            }
+          ]
+        }
+      },
+      {
+        "operationType": "Destination",
+        "sourceSettings": null,
+        "destinationSettings": {
+          "endpointRef": "default",
+          "dataDestination": "devices/xpto/temperature-copy"
+        }
+      }
+    ],
+    "provisioningState": "Accepted"
+  },
+  "type": "microsoft.iotoperations/instances/dataflowprofiles/dataflows",
+  "extendedLocation": {
+    "name": "/subscriptions/05e06692-cc6a-4772-81a3-89cd2b429bbe/resourceGroups/iot-lab/providers/Microsoft.ExtendedLocation/customLocations/aio-cl",
+    "type": "CustomLocation"
+  }
+}

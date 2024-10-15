@@ -46,7 +46,7 @@
   },
   "type": "microsoft.iotoperations/instances/dataflowprofiles/dataflows",
   "extendedLocation": {
-    "name": "/subscriptions/05e06692-cc6a-4772-81a3-89cd2b429bbe/resourceGroups/iot-lab/providers/Microsoft.ExtendedLocation/customLocations/aio-cl",
+    "name": "/subscriptions/xxxxxxxxxxxxxxxxxxxxxxxxxxx/resourceGroups/iot-lab/providers/Microsoft.ExtendedLocation/customLocations/aio-cl",
     "type": "CustomLocation"
   }
 }

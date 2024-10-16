@@ -1,0 +1,12 @@
+{
+    "$schema": "Delta/1.0",
+    "type": "object",
+    "properties": {
+      "type": "struct",
+      "fields": [
+        { "name": "AssetId", "type": "string", "nullable": true, "metadata": {} },
+        { "name": "Temperature", "type": "double", "nullable": true, "metadata": {} },
+        { "name": "Timestamp", "type": "string", "nullable": true, "metadata": {} }
+      ]
+    }
+  }

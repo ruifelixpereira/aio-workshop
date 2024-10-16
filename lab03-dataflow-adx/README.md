@@ -23,7 +23,7 @@ Create a new cluster or use an existing one (e.g., Dev/Test size) and make sure 
 
 ![alt text](docs/assets/ingestion.png)
 
-In the Permissions option, add the `AllDatabasesAdmin` role to your own user. This will simplify some of the operations you will need to execute later.
+In the Permissions option, add the `AllDatabasesAdmin` role to your own user. This will allow some of the operations you will need to execute later.
 
 ![alt text](docs/assets/left-hand-menu.png)
 

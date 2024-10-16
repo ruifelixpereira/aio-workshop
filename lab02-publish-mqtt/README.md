@@ -15,6 +15,14 @@ kubectl get services -n azure-iot-operations
 
 In this example the broker is both available internally (for MQTT clients running inside the K8S cluster) and externally. The internal endpoint is `aio-broker.azure-iot-operations.svc.cluster.local` and the external endpoint is `10.0.0.4`. The broker is listening on port `18883`.
 
+## Step 2. Deploy MQTT client
+
+To test publishing and subscribing messages, let's deploy a sample client pod:
+
+```bash
+kubectl create serviceaccount mqtt-client -n azure-iot-operations
+kubectl apply -f mqtt-client.yaml
+```
 
 ## Step 2. Publish messages
 

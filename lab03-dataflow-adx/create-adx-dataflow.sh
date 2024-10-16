@@ -61,6 +61,7 @@ else
    #RG_ID=$(az group show --name $RESOURCE_GROUP --query id -o tsv)
 fi
 
+
 #
 # Create lab
 #
@@ -69,12 +70,12 @@ az deployment group create \
       --resource-group $resource_group \
       --template-file ./adx-dataflow.bicep \
       --parameters customLocationName=$customLocationName \
-      --parameters schemaRegistryResourceGroup=$schemaRegistryResourceGroup \
       --parameters schemaRegistryName=$schemaRegistryName \
+      --parameters schemaRegistryResourceGroup=$schemaRegistryResourceGroup \
       --parameters aioInstanceName=$aioInstanceName \
       --parameters mqttTopic=$mqttTopic \
       --parameters adxDatabaseName=$adxDatabaseName \
-      --parameters adxTableName=$adxDatabaseName \
+      --parameters adxTableName=$adxTableName \
       --parameters adxClusterUri="${adxClusterUri}"
 
 exit 0

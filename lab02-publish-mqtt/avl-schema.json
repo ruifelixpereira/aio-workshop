@@ -1,0 +1,30 @@
+{
+    "$schema": "Delta/1.0",
+    "type": "object",
+    "properties": {
+      "type": "struct",
+      "fields": [
+        { "name": "ID", "type": "string", "nullable": true, "metadata": {} },
+        { "name": "NCH1", "type": "double", "nullable": true, "metadata": {} },
+        { "name": "NCH2", "type": "double", "nullable": true, "metadata": {} },
+        { "name": "NCH3", "type": "double", "nullable": true, "metadata": {} },
+        { "name": "NCH4", "type": "double", "nullable": true, "metadata": {} },
+        { "name": "NCH5", "type": "double", "nullable": true, "metadata": {} },
+        { "name": "NCH6", "type": "double", "nullable": true, "metadata": {} },
+        { "name": "NCH7", "type": "double", "nullable": true, "metadata": {} },
+        { "name": "NCH8", "type": "double", "nullable": true, "metadata": {} },
+        { "name": "NCH9", "type": "double", "nullable": true, "metadata": {} },
+        { "name": "NCH10", "type": "double", "nullable": true, "metadata": {} },
+        { "name": "NCH11", "type": "double", "nullable": true, "metadata": {} },
+        { "name": "NCH12", "type": "double", "nullable": true, "metadata": {} },
+        { "name": "NCH13", "type": "double", "nullable": true, "metadata": {} },
+        { "name": "NCH14", "type": "double", "nullable": true, "metadata": {} },
+        { "name": "NCH15", "type": "double", "nullable": true, "metadata": {} },
+        { "name": "NCH16", "type": "double", "nullable": true, "metadata": {} },
+        { "name": "NCH17", "type": "double", "nullable": true, "metadata": {} },
+        { "name": "NCH18", "type": "double", "nullable": true, "metadata": {} },
+        { "name": "NCH19", "type": "double", "nullable": true, "metadata": {} },
+        { "name": "NCH20", "type": "double", "nullable": true, "metadata": {} }
+        ]
+    }
+  }

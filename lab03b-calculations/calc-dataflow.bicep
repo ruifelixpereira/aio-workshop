@@ -13,11 +13,25 @@ var opcuaSchemaContent = '''
 }
 '''
 
-// Parameters
+var opcuaSchemaContentOut = '''
+{
+  "$schema": "Delta/1.0",
+  "type": "object",
+  "properties": {
+    "type": "struct",
+    "fields": [
+      { "name": "ID", "type": "string", "nullable": true, "metadata": {} },
+      { "name": "Temp", "type": "double", "nullable": true, "metadata": {} },
+      { "name": "Timestamp", "type": "string", "nullable": true, "metadata": {} }
+    ]
+  }
+}
+'''
+
+// Parameters AIO
 param customLocationName string = 'aio-cl'
 param defaultDataflowEndpointName string = 'default'
 param defaultDataflowProfileName string = 'default'
-param schemaRegistryName string = 'aiosreg'
 param aioInstanceName string = 'aio-ops-instance'
 
 // Source MQTT topic
@@ -28,9 +42,15 @@ param adxClusterUri string = 'https://iot-ts.westus.kusto.windows.net'
 param adxDatabaseName string = 'iot'
 param adxTableName string = 'SensorData'
 
+// Schema Registry
+param schemaRegistryResourceGroup string = 'iot-lab'
+param schemaRegistryName string = 'aiosreg'
+
 // Schema
-param opcuaSchemaName string = 'sensor-data-delta'
+param opcuaSchemaName string = 'sensor-calc-data-delta'
 param opcuaSchemaVer string = '1'
+param opcuaSchemaNameOut string = 'sensor-calc-data-delta-out'
+param opcuaSchemaVerOut string = '1'
 
 
 resource customLocation 'Microsoft.ExtendedLocation/customLocations@2021-08-31-preview' existing = {
@@ -51,34 +71,34 @@ resource defaultDataflowProfile 'Microsoft.IoTOperations/instances/dataflowProfi
   name: defaultDataflowProfileName
 }
 
-resource schemaRegistry 'Microsoft.DeviceRegistry/schemaRegistries@2024-09-01-preview' existing = {
-  name: schemaRegistryName
-}
-
-resource opcSchema 'Microsoft.DeviceRegistry/schemaRegistries/schemas@2024-09-01-preview' = {
-  parent: schemaRegistry
-  name: opcuaSchemaName
-  properties: {
-    displayName: 'Sensor Temperature Custom Delta Schema'
-    description: 'This is a custom delta Schema'
-    format: 'Delta/1.0'
-    schemaType: 'MessageSchema'
+// Schema
+module schemaModule './modules/schema-registry.bicep' = {
+  name: 'schemaDeploy'
+  scope: resourceGroup(schemaRegistryResourceGroup)
+  params: {
+    schemaRegistryName: schemaRegistryName
+    opcuaSchemaName: opcuaSchemaName
+    opcuaSchemaVer: opcuaSchemaVer
+    opcuaSchemaContent: opcuaSchemaContent
   }
 }
 
-resource opcuaSchemaInstance 'Microsoft.DeviceRegistry/schemaRegistries/schemas/schemaVersions@2024-09-01-preview' = {
-  parent: opcSchema
-  name: opcuaSchemaVer
-  properties: {
-    description: 'Schema version'
-    schemaContent: opcuaSchemaContent
+// Schema
+module schemaModuleOut './modules/schema-registry.bicep' = {
+  name: 'schemaDeployOut'
+  scope: resourceGroup(schemaRegistryResourceGroup)
+  params: {
+    schemaRegistryName: schemaRegistryName
+    opcuaSchemaName: opcuaSchemaNameOut
+    opcuaSchemaVer: opcuaSchemaVerOut
+    opcuaSchemaContent: opcuaSchemaContentOut
   }
 }
 
 // ADX Endpoint
 resource adxEndpoint 'Microsoft.IoTOperations/instances/dataflowEndpoints@2024-08-15-preview' = {
   parent: aioInstance
-  name: 'adx-ep-2'
+  name: 'adx-ep'
   extendedLocation: {
     name: customLocation.id
     type: 'CustomLocation'
@@ -103,7 +123,7 @@ resource adxEndpoint 'Microsoft.IoTOperations/instances/dataflowEndpoints@2024-0
 // ADX dataflow
 resource dataflow_adx 'Microsoft.IoTOperations/instances/dataflowProfiles/dataflows@2024-08-15-preview' = {
   parent: defaultDataflowProfile
-  name: 'adx-dataflow-2'
+  name: 'calc-dataflow'
   extendedLocation: {
     name: customLocation.id
     type: 'CustomLocation'
@@ -123,11 +143,19 @@ resource dataflow_adx 'Microsoft.IoTOperations/instances/dataflowProfiles/datafl
         builtInTransformationSettings: {
           map: [
             {
-              inputs: array('*')
-              output: '*'
+              inputs: ['AssetId']
+              output: 'ID'
+            }
+            {
+              inputs: ['Temperature']
+              output: 'Temp'
+            }
+            {
+              inputs: ['Timestamp']
+              output: 'Timestamp'
             }
           ]
-          schemaRef: 'aio-sr://${opcuaSchemaName}:${opcuaSchemaVer}'
+          schemaRef: 'aio-sr://${opcuaSchemaNameOut}:${opcuaSchemaVerOut}'
           serializationFormat: 'Parquet'
         }
       }

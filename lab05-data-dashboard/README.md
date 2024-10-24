@@ -1,4 +1,4 @@
-# Lab04. Visualize data using dashboards
+# Lab05. Visualize data using dashboards
 
 This lab aims to configure a simple Grafana dashboard to visualize the data ingested into Azure Data Explorer (ADX). It is based on the [official documentation](https://learn.microsoft.com/en-us/azure/data-explorer/grafana?tabs=azure-managed-grafana).
 

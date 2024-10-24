@@ -5,23 +5,10 @@ var opcuaSchemaContent = '''
   "properties": {
     "type": "struct",
     "fields": [
-      { "name": "AssetId", "type": "string", "nullable": true, "metadata": {} },
-      { "name": "Temperature", "type": "double", "nullable": true, "metadata": {} },
-      { "name": "Timestamp", "type": "string", "nullable": true, "metadata": {} }
-    ]
-  }
-}
-'''
-
-var opcuaSchemaContentOut = '''
-{
-  "$schema": "Delta/1.0",
-  "type": "object",
-  "properties": {
-    "type": "struct",
-    "fields": [
       { "name": "ID", "type": "string", "nullable": true, "metadata": {} },
-      { "name": "Temp", "type": "double", "nullable": true, "metadata": {} },
+      { "name": "Topic", "type": "string", "nullable": true, "metadata": {} },
+      { "name": "TempC", "type": "double", "nullable": true, "metadata": {} },
+      { "name": "TempF", "type": "double", "nullable": true, "metadata": {} },
       { "name": "Timestamp", "type": "string", "nullable": true, "metadata": {} }
     ]
   }
@@ -34,23 +21,22 @@ param defaultDataflowEndpointName string = 'default'
 param defaultDataflowProfileName string = 'default'
 param aioInstanceName string = 'aio-ops-instance'
 
+
 // Source MQTT topic
 param mqttTopic string = 'thermostats/temperature'
 
 // Target ADX
 param adxClusterUri string = 'https://iot-ts.westus.kusto.windows.net'
 param adxDatabaseName string = 'iot'
-param adxTableName string = 'SensorData'
+param adxTableName string = 'SensorTempData'
 
 // Schema Registry
 param schemaRegistryResourceGroup string = 'iot-lab'
 param schemaRegistryName string = 'aiosreg'
 
 // Schema
-param opcuaSchemaName string = 'sensor-calc-data-delta'
+param opcuaSchemaName string = 'sensor-calc-temp-delta-out'
 param opcuaSchemaVer string = '1'
-param opcuaSchemaNameOut string = 'sensor-calc-data-delta-out'
-param opcuaSchemaVerOut string = '1'
 
 
 resource customLocation 'Microsoft.ExtendedLocation/customLocations@2021-08-31-preview' existing = {
@@ -82,18 +68,7 @@ module schemaModule './modules/schema-registry.bicep' = {
     opcuaSchemaContent: opcuaSchemaContent
   }
 }
-
-// Schema
-module schemaModuleOut './modules/schema-registry.bicep' = {
-  name: 'schemaDeployOut'
-  scope: resourceGroup(schemaRegistryResourceGroup)
-  params: {
-    schemaRegistryName: schemaRegistryName
-    opcuaSchemaName: opcuaSchemaNameOut
-    opcuaSchemaVer: opcuaSchemaVerOut
-    opcuaSchemaContent: opcuaSchemaContentOut
-  }
-}
+ 
 
 // ADX Endpoint
 resource adxEndpoint 'Microsoft.IoTOperations/instances/dataflowEndpoints@2024-08-15-preview' = {
@@ -148,14 +123,23 @@ resource dataflow_adx 'Microsoft.IoTOperations/instances/dataflowProfiles/datafl
             }
             {
               inputs: ['Temperature']
-              output: 'Temp'
+              output: 'TempC'
+            }
+            {
+              inputs: ['Temperature']
+              output: 'TempF'
+              expression: '($1 * 9/5) + 32'
+            }
+            {
+              inputs: ['$metadata.topic']
+              output: 'Topic'
             }
             {
               inputs: ['Timestamp']
               output: 'Timestamp'
-            }
+            }           
           ]
-          schemaRef: 'aio-sr://${opcuaSchemaNameOut}:${opcuaSchemaVerOut}'
+          schemaRef: 'aio-sr://${opcuaSchemaName}:${opcuaSchemaVer}'
           serializationFormat: 'Parquet'
         }
       }
